@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+DEB_HBUILD_SETUPFILE ?= $(firstword $(wildcard $(DEB_SRCDIR)/Setup.lhs $(DEB_SRCDIR)/Setup.hs))
+
+clean::
+	$(DEB_HBUILD_SETUPFILE) clean
+
+configure/frame-ctrl::
+	$(DEB_HBUILD_SETUPFILE) --prefix=$(DEB_DESTDIR) configure
+
+build/frame-ctrl::
+	$(DEB_HBUILD_SETUPFILE) build
+
+install/frame-ctrl::
+	$(DEB_HBUILD_SETUPFILE) copy
+	dh_haskell_depends -p$(notdir $@)

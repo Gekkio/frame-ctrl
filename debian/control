@@ -1,0 +1,23 @@
+Source: frame-ctrl
+Section: haskell
+Priority: extra
+Maintainer: Joonas Javanainen <joonas.javanainen@gmail.com>
+Build-Depends: debhelper (>= 7)
+  , cdbs
+  , haskell-devscripts (>= 0.8)
+  , ghc
+  , libghc-usb-dev (>= 1.2)
+  , libghc-vector-dev (>= 0.9)
+  , pkg-config
+Build-Depends-Indep: ghc-doc
+Standards-Version: 3.9.2
+
+Package: frame-ctrl
+Architecture: any
+Depends: ${haskell:Depends}
+  , ${shlibs:Depends}
+  , ${misc:Depends}
+Recommends: ${haskell:Recommends}
+Suggests: ${haskell:Suggests}
+Provides: ${haskell:Provides}
+Description: A small application for controlling Samsung photo frames
