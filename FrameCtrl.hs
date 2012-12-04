@@ -98,7 +98,12 @@ storageMode (dev, model) ctx = do
   waitForDisplayMode modeSwitchTimeout ctx
 
 activateDisplayMode :: Device -> IO (Maybe String)
-activateDisplayMode dev = putStrLn "Activating display mode" >> usbCommunication dev usbActivateDisplayMode
+activateDisplayMode dev = do
+  result <- try $ putStrLn "Activating display mode" >> usbCommunication dev usbActivateDisplayMode
+  case result of
+    Left (USBEx.NoDeviceException) -> return Nothing
+    Left e -> throwIO e
+    Right x -> return x
 
 waitForDisplayMode :: Int -> CtxIO ()
 waitForDisplayMode timeout
