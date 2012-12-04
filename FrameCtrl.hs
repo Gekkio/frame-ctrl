@@ -4,6 +4,7 @@ import Control.Monad
 import Data.Binary.Put
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Vector as V
 import Data.Word
 import System.Environment (getArgs)
 import System.Exit
@@ -84,7 +85,8 @@ doWithDevice productId success failure ctx = do
 lookupDevice :: (Model -> Word16) -> CtxIO (Maybe (Device, Model))
 lookupDevice productId ctx = do
   devs <- getDevices ctx
-  let matching = findDevices productId devs
+  descs <- V.mapM getDeviceDesc devs
+  let matching = findDevices productId $ V.toList $ V.zip devs descs
   takeOne matching
   where
     takeOne [] = return Nothing
@@ -161,14 +163,12 @@ readImage = do
     (path:_) -> B.readFile path
     _ -> B.getContents
 
-findDevices :: (Model -> Word16) -> [Device] -> [(Device, Model)]
+findDevices :: (Model -> Word16) -> [(Device, DeviceDesc)] -> [(Device, Model)]
 findDevices productId devs = do
   model <- models
-  dev <- (filter $ isSupported $ productId model) devs
+  (dev, _) <- (filter $ isSupported $ productId model) devs
   return (dev, model)
 
-isSupported :: Word16 -> Device -> Bool
-isSupported productId dev = (deviceVendorId devDesc == vendorId)
-                          && (deviceProductId devDesc == productId)
-  where
-    devDesc = deviceDesc dev
+isSupported :: Word16 -> (Device, DeviceDesc) -> Bool
+isSupported productId (_, desc) = (deviceVendorId desc == vendorId)
+                          && (deviceProductId desc == productId)
